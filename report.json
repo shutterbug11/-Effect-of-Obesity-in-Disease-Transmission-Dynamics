@@ -1,5 +1,5 @@
 {
-  "project": "Effect of Obesity in Disease Transmission Dynamics using Machine Learning",
+  "project": "Effect of Obesity on Disease Risk using Machine Learning",
   "dataset": {
     "name": "Stroke Prediction Dataset (Nnaodeh/Stroke_Prediction_Dataset)",
     "total_samples": 5110,
@@ -26,22 +26,6 @@
     "heart_disease_rate_obese": 0.0625,
     "heart_disease_rate_nonobese": 0.04890282131661442,
     "heart_disease_relative_risk": 1.2780448717948718
-  },
-  "epidemic_simulation": {
-    "population_size": 10000,
-    "simulation_days": 200,
-    "base_infection_rate": 0.03,
-    "base_recovery_rate": 0.08,
-    "obesity_susceptibility_multiplier": 2.0,
-    "initial_infected": 20,
-    "obesity_rate": 0.35,
-    "total_infected": 8510,
-    "attack_rate": 0.851,
-    "obese_attack_rate": 0.9648571428571429,
-    "nonobese_attack_rate": 0.7896923076923077,
-    "relative_risk_obese_vs_nonobese": 1.2218140324510869,
-    "peak_infected_day": 44,
-    "peak_infected_count": 3816
   },
   "individual_risk_prediction": {
     "stroke": {
@@ -123,86 +107,6 @@
           "recall": 0.0,
           "f1": 0.0,
           "auc": 0.4854188210961738
-        }
-      }
-    }
-  },
-  "epidemic_forecasting": {
-    "total_infections": {
-      "best_model": "XGBoost",
-      "best_mae": 3.7836668491363525,
-      "all_models": {
-        "Ridge": {
-          "mae": 4.037584673180052,
-          "rmse": 9.568517963958625,
-          "r2": 0.9839042658397826
-        },
-        "RandomForest": {
-          "mae": 6.766794871794871,
-          "rmse": 15.965845688883928,
-          "r2": 0.9551868685706733
-        },
-        "GradientBoosting": {
-          "mae": 5.225777169040602,
-          "rmse": 11.309009584048434,
-          "r2": 0.9775161550508109
-        },
-        "XGBoost": {
-          "mae": 3.7836668491363525,
-          "rmse": 8.43648992073227,
-          "r2": 0.9874874949455261
-        }
-      }
-    },
-    "obese_infections": {
-      "best_model": "XGBoost",
-      "best_mae": 1.9400713443756104,
-      "all_models": {
-        "Ridge": {
-          "mae": 2.145079420235436,
-          "rmse": 5.864420594501455,
-          "r2": 0.9697155488488685
-        },
-        "RandomForest": {
-          "mae": 3.3615384615384616,
-          "rmse": 8.69335540543053,
-          "r2": 0.9334505674278688
-        },
-        "GradientBoosting": {
-          "mae": 2.3676433633305134,
-          "rmse": 5.584143670048345,
-          "r2": 0.9725411304657448
-        },
-        "XGBoost": {
-          "mae": 1.9400713443756104,
-          "rmse": 4.911230195923778,
-          "r2": 0.9787602424621582
-        }
-      }
-    },
-    "nonobese_infections": {
-      "best_model": "Ridge",
-      "best_mae": 2.464996871412317,
-      "all_models": {
-        "Ridge": {
-          "mae": 2.464996871412317,
-          "rmse": 6.878308533520347,
-          "r2": 0.9737721971156154
-        },
-        "RandomForest": {
-          "mae": 3.123279914529915,
-          "rmse": 7.738301818418664,
-          "r2": 0.9668036805681224
-        },
-        "GradientBoosting": {
-          "mae": 4.100960036133589,
-          "rmse": 8.114482872979416,
-          "r2": 0.9634976939863482
-        },
-        "XGBoost": {
-          "mae": 2.797187328338623,
-          "rmse": 6.430563736048256,
-          "r2": 0.9770756959915161
         }
       }
     }
