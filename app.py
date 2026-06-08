@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import streamlit as st
 
@@ -224,6 +226,60 @@ def scenario_risk(
     return min(risk, 0.65)
 
 
+def scenario_base_rate(effect: dict, outcome: str, bmi: float) -> float:
+    obesity_status = "obese" if bmi >= 30 else "nonobese"
+    return effect[f"{outcome}_rate_{obesity_status}"]
+
+
+def scenario_surface(
+    effect: dict,
+    outcome: str,
+    ages: np.ndarray,
+    bmis: np.ndarray,
+    glucose: float,
+    hypertension: bool,
+    smoker: bool,
+) -> np.ndarray:
+    surface = np.zeros((len(ages), len(bmis)))
+    for row, age_value in enumerate(ages):
+        for col, bmi_value in enumerate(bmis):
+            baseline = scenario_base_rate(effect, outcome, float(bmi_value))
+            surface[row, col] = scenario_risk(
+                baseline,
+                float(bmi_value),
+                int(age_value),
+                glucose,
+                hypertension,
+                smoker,
+            )
+    return surface
+
+
+def render_risk_heatmap(
+    title: str,
+    surface: np.ndarray,
+    ages: np.ndarray,
+    bmis: np.ndarray,
+    selected_age: int,
+    selected_bmi: float,
+) -> None:
+    fig, ax = plt.subplots(figsize=(7.2, 4.4))
+    heatmap = ax.imshow(
+        surface * 100,
+        origin="lower",
+        aspect="auto",
+        extent=[bmis.min(), bmis.max(), ages.min(), ages.max()],
+        cmap="YlOrRd",
+    )
+    ax.scatter([selected_bmi], [selected_age], color="#17202a", s=44, edgecolor="white", linewidth=1.2)
+    ax.axvline(30, color="#17202a", linestyle="--", linewidth=1, alpha=0.65)
+    ax.set_title(title)
+    ax.set_xlabel("BMI")
+    ax.set_ylabel("Age")
+    fig.colorbar(heatmap, ax=ax, label="Estimated risk (%)")
+    st.pyplot(fig, clear_figure=True)
+
+
 def render_header(report: dict) -> None:
     st.title("Obesity and Disease Risk Prediction")
     st.markdown(
@@ -355,6 +411,45 @@ def render_risk_lab(report: dict) -> None:
             '<p class="metric-note">For true patient-level prediction, the next upgrade is to persist the trained preprocessing pipeline and model artifacts with joblib.</p>',
             unsafe_allow_html=True,
         )
+
+    st.subheader("Live Risk Heatmaps")
+    st.markdown(
+        """
+        <p class="section-note">
+        Heatmaps update from the current slider values. Age and BMI vary across
+        the map while glucose, hypertension, and smoking stay fixed to your
+        selected scenario.
+        </p>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    age_grid = np.linspace(18, 90, 49)
+    bmi_grid = np.linspace(16, 45, 59)
+    stroke_surface = scenario_surface(effect, "stroke", age_grid, bmi_grid, glucose, hypertension, smoker)
+    heart_surface = scenario_surface(effect, "heart_disease", age_grid, bmi_grid, glucose, hypertension, smoker)
+
+    heatmap_cols = st.columns(2)
+    with heatmap_cols[0]:
+        render_risk_heatmap("Stroke Risk Surface", stroke_surface, age_grid, bmi_grid, age, bmi)
+    with heatmap_cols[1]:
+        render_risk_heatmap("Heart Disease Risk Surface", heart_surface, age_grid, bmi_grid, age, bmi)
+
+    trend_bmis = np.linspace(16, 45, 59)
+    trend_df = pd.DataFrame(
+        {
+            "BMI": trend_bmis,
+            "Stroke risk": [
+                scenario_risk(scenario_base_rate(effect, "stroke", float(value)), float(value), age, glucose, hypertension, smoker)
+                for value in trend_bmis
+            ],
+            "Heart disease risk": [
+                scenario_risk(scenario_base_rate(effect, "heart_disease", float(value)), float(value), age, glucose, hypertension, smoker)
+                for value in trend_bmis
+            ],
+        }
+    ).set_index("BMI")
+    st.line_chart(trend_df)
 
 
 def render_model_performance(report: dict) -> None:
