@@ -371,10 +371,12 @@ def generate_report(df, individual_results, feature_cols):
         }
     }
     
-    with open("results/report.json", "w") as f:
-        json.dump(report, f, indent=2)
-    
-    print("\nSaved comprehensive report to results/report.json")
+    for report_path in ["report.json", "results/report.json"]:
+        with open(report_path, "w") as f:
+            json.dump(report, f, indent=2)
+            f.write("\n")
+
+    print("\nSaved comprehensive report to report.json and results/report.json")
     return report
 
 # ============================================================================
